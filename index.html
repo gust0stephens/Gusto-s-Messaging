@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>I.P.S. DRAKE // SECURE COMMS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+:root{--g:#00ff66;--dim:#006626;--bg:#020b05;--amber:#ffb000;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--g);font-family:'VT323','Courier New',monospace;font-size:20px;overflow:hidden}
+#crt{position:absolute;inset:12px;border:3px solid var(--g);border-radius:40px/24px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);box-shadow:0 0 15px rgba(0,255,102,.4),inset 0 0 15px rgba(0,255,102,.2),inset 0 0 90px rgba(0,0,0,.9)}
+.ov{position:absolute;inset:0;pointer-events:none;z-index:50;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%),linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,.4) 50%);background-size:100% 100%,100% 4px}
+.scan{position:absolute;left:0;width:100%;height:5px;background:rgba(0,255,102,.85);box-shadow:0 0 18px rgba(0,255,102,.6);pointer-events:none;z-index:49;opacity:0;animation:sw 8s linear infinite}
+@keyframes sw{0%{top:0;opacity:0}5%{opacity:1}30%{top:100%;opacity:0}100%{top:100%;opacity:0}}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 20px;border-bottom:2px solid var(--g);flex-wrap:wrap}
+.top h1{font-size:24px;margin:0;font-weight:400;letter-spacing:2px}
+.badge{border:1px solid var(--g);padding:1px 8px;font-size:17px;letter-spacing:1px}
+.badge.amber{color:var(--amber);border-color:var(--amber)}
+.main{flex:1;display:flex;min-height:0}
+.side{width:230px;border-right:2px solid var(--g);padding:10px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.blk{border:1px solid var(--dim);padding:6px 8px}
+.blk h2{font-size:15px;font-weight:400;color:var(--dim);border-bottom:1px solid var(--dim);margin:0 0 4px;letter-spacing:1px}
+.blk .v{font-size:20px;word-break:break-word}
+button,input,select{font-family:inherit;font-size:19px;color:var(--g);background:#000;border:1px solid var(--g);padding:3px 8px;outline:none}
+button{cursor:pointer;letter-spacing:1px}
+button:hover,button.on{background:var(--g);color:#000}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+label{display:flex;align-items:center;gap:6px;font-size:18px}
+input[type=range]{padding:0;accent-color:var(--g);width:100%}
+.chat{flex:1;display:flex;flex-direction:column;min-width:0}
+#log{flex:1;overflow-y:auto;padding:12px 18px;display:flex;flex-direction:column;gap:6px}
+.m{max-width:85%;word-break:break-word;line-height:1.05}
+.m .meta{font-size:15px;color:var(--dim)}
+.m.me{align-self:flex-end;text-align:right}
+.m.them .txt{color:var(--amber)}
+.m.sys{align-self:center;color:var(--dim);font-size:17px}
+.m.new{animation:fl .8s steps(2) 3}
+@keyframes fl{50%{background:rgba(0,255,102,.25)}}
+.inp{display:flex;gap:8px;border-top:2px solid var(--g);padding:8px 14px}
+.inp input{flex:1;min-width:0}
+.inp::before{content:">";align-self:center}
+#boot{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:30px;text-align:center;cursor:pointer;transition:opacity .6s}
+#boot.h{opacity:0;pointer-events:none}
+#boot .l{opacity:0;animation:fi .2s forwards;white-space:pre-wrap}
+@keyframes fi{to{opacity:1}}
+.bl{animation:bk 1s steps(1) infinite}
+@keyframes bk{50%{opacity:0}}
+#boot input{text-align:center;width:260px}
+@media(max-width:700px){.side{display:none}#crt{inset:6px;border-radius:24px/16px}.top h1{font-size:19px}}
+</style>
+</head>
+<body>
+<div id="boot">
+  <div class="l" style="font-size:26px">I.P.S. DRAKE SECURE COMMS</div>
+  <div class="l" style="animation-delay:.4s">&gt; ESTABLISHING DEEPNET UPLINK... [ OK ]</div>
+  <div class="l" style="animation-delay:.8s">&gt; ENTER CALLSIGN:</div>
+  <input id="cs" class="l" style="animation-delay:1.1s" maxlength="16" autocomplete="off" placeholder="CALLSIGN">
+  <div class="l" style="animation-delay:1.2s">&gt; ENTER SHARED ROOM CODE (SAME FOR BOTH OF YOU):</div>
+  <input id="room" class="l" style="animation-delay:1.3s" maxlength="40" autocomplete="off" placeholder="ROOM CODE">
+  <div class="l bl" style="animation-delay:1.5s" id="go">[ CLICK HERE TO CONNECT ]</div>
+</div>
+
+<div id="crt">
+  <div class="scan"></div><div class="ov"></div>
+  <div class="top">
+    <h1>SECURE COMMS TERMINAL</h1>
+    <div class="row"><span class="badge" id="link">LINK: ----</span><span class="badge amber" id="unread" style="display:none">0 UNREAD</span></div>
+  </div>
+  <div class="main">
+    <div class="side">
+      <div class="blk"><h2>OPERATOR</h2><div class="v" id="me">--</div></div>
+      <div class="blk"><h2>TRANSMISSIONS</h2><div class="v" id="count">0</div></div>
+      <div class="blk"><h2>VOICE READOUT</h2>
+        <label><input type="checkbox" id="vOn" checked> READ ALOUD</label>
+        <label><input type="checkbox" id="sOn" checked> ALERT TONE</label>
+        <div style="font-size:15px;color:var(--dim)">SPEED</div><input type="range" id="rate" min="0.6" max="1.6" step="0.1" value="0.9">
+        <div style="font-size:15px;color:var(--dim)">PITCH</div><input type="range" id="pitch" min="0" max="1" step="0.1" value="0.1">
+        <div style="font-size:15px;color:var(--dim)">VOICE</div><select id="voice" style="width:100%"></select>
+        <div class="row" style="margin-top:6px"><button id="replay">REPLAY LAST</button><button id="stop">SILENCE</button></div>
+      </div>
+      <div class="blk"><h2>TOOLS</h2>
+        <div class="row"><button id="ping">PING BUDDY</button><button id="dl">SAVE LOG</button><button id="clr">CLEAR VIEW</button></div>
+        <div style="font-size:15px;color:var(--dim);margin-top:4px">/ping /clear /voice /save</div>
+      </div>
+    </div>
+    <div class="chat">
+      <div id="log"></div>
+      <div class="inp"><input id="msg" maxlength="500" autocomplete="off" placeholder="TRANSMIT MESSAGE..."><button id="send">SEND</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const log=$('log'),msg=$('msg');
+let uid='',callsign='OPERATOR',first=true,unread=0,lastIn=null,clearedAt=0,all=[];
+let audio=null,voices=[];
+const S={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+/* ---------- audio / speech ---------- */
+function beep(f1,f2){
+  if(!$('sOn').checked)return;
+  try{
+    audio=audio||new (window.AudioContext||window.webkitAudioContext)();
+    const o=audio.createOscillator(),g=audio.createGain();
+    o.type='square';o.frequency.setValueAtTime(f1||880,audio.currentTime);o.frequency.setValueAtTime(f2||1320,audio.currentTime+.1);
+    g.gain.setValueAtTime(.06,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.3);
+    o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+.3);
+  }catch(e){}
+}
+function loadVoices(){
+  if(!('speechSynthesis' in window))return;
+  voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+  const sel=$('voice'),cur=S.get('voice','');
+  sel.innerHTML='<option value="">DEFAULT</option>';
+  voices.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=v.name.slice(0,26).toUpperCase();if(v.name===cur)o.selected=true;sel.appendChild(o)});
+}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function speak(t){
+  if(!('speechSynthesis' in window)||!$('vOn').checked)return;
+  const clean=t.replace(/https?:\/\/\S+/g,' link ').replace(/[_*#~`]/g,' ');
+  const u=new SpeechSynthesisUtterance(clean);
+  u.rate=+$('rate').value;u.pitch=+$('pitch').value;
+  const v=voices.find(x=>x.name===$('voice').value);if(v)u.voice=v;
+  speechSynthesis.speak(u);
+}
+function announce(m){
+  if(m.kind==='ping')return speak('Attention. '+m.from+' is pinging you.');
+  speak('Incoming transmission from '+m.from+'. '+m.text);
+}
+
+/* ---------- render ---------- */
+function fmt(ts){const d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function sys(t){const d=document.createElement('div');d.className='m sys';d.textContent='-- '+t+' --';log.appendChild(d);log.scrollTop=log.scrollHeight}
+function render(newIds){
+  log.innerHTML='';
+  const shown=all.filter(m=>m.ts>clearedAt);
+  shown.forEach(m=>{
+    const d=document.createElement('div');
+    const mine=m.uid===uid;
+    d.className='m '+(mine?'me':'them')+(newIds&&newIds.has(m.id)?' new':'');
+    const meta=document.createElement('div');meta.className='meta';
+    meta.textContent='['+fmt(m.ts)+'] '+(mine?'YOU':m.from);
+    const t=document.createElement('div');t.className='txt';
+    t.textContent=m.kind==='ping'?'*** PING ***':m.text;
+    d.appendChild(meta);d.appendChild(t);log.appendChild(d);
+  });
+  if(!shown.length)sys('NO TRANSMISSIONS. SAY SOMETHING.');
+  $('count').textContent=all.length;
+  log.scrollTop=log.scrollHeight;
+}
+function setUnread(n){
+  unread=n;const b=$('unread');
+  b.style.display=n?'':'none';b.textContent=n+' UNREAD';
+  document.title=n?'('+n+') I.P.S. DRAKE // COMMS':'I.P.S. DRAKE // SECURE COMMS';
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setUnread(0)});
+window.addEventListener('focus',()=>setUnread(0));
+
+/* ---------- send / receive via ntfy.sh ---------- */
+const BASE='https://ntfy.sh';let room='',seen=new Set(),live=false;
+async function send(text,kind){
+  text=text.trim();if(!text&&kind!=='ping')return;
+  const m={from:callsign,uid:uid,text:text||'',kind:kind||'msg',ts:Date.now()};
+  try{
+    const r=await fetch(BASE+'/'+room,{method:'POST',body:JSON.stringify(m)});
+    if(!r.ok)throw new Error(r.status);
+    beep(660,440);
+  }catch(e){sys('TRANSMIT FAILED - CHECK CONNECTION')}
+}
+function submit(){
+  const t=msg.value;msg.value='';
+  if(t[0]==='/'){
+    const c=t.slice(1).trim().toLowerCase();
+    if(c==='ping')return send('','ping');
+    if(c==='clear')return doClear();
+    if(c==='voice'){$('vOn').checked=!$('vOn').checked;return sys('VOICE '+($('vOn').checked?'ON':'OFF'))}
+    if(c==='save')return save();
+    return sys('UNKNOWN COMMAND');
+  }
+  send(t);
+}
+function doClear(){clearedAt=Date.now();render()}
+function save(){
+  const txt=all.map(m=>'['+new Date(m.ts).toLocaleString()+'] '+m.from+': '+(m.kind==='ping'?'*** PING ***':m.text)).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.download='comms-log.txt';
+  document.body.appendChild(a);a.click();a.remove();sys('LOG SAVED');
+}
+function connect(){
+  $('link').textContent='LINK: CONNECTING';
+  const es=new EventSource(BASE+'/'+room+'/sse?since=12h');
+  es.onopen=()=>{$('link').textContent='LINK: ONLINE';setTimeout(()=>{live=true},1500)};
+  es.onerror=()=>{$('link').textContent='LINK: RETRYING'};
+  es.onmessage=ev=>{
+    let e,m;
+    try{e=JSON.parse(ev.data)}catch(x){return}
+    if(e.event!=='message'||seen.has(e.id))return;
+    try{m=JSON.parse(e.message)}catch(x){return}
+    if(!m||typeof m.text!=='string'||typeof m.from!=='string')return;
+    seen.add(e.id);m.id=e.id;m.ts=+m.ts||e.time*1000;
+    all.push(m);all.sort((x,y)=>x.ts-y.ts);
+    render(live?new Set([m.id]):null);
+    if(live&&m.uid!==uid){
+      lastIn=m;beep();announce(m);
+      if(document.hidden||!document.hasFocus())setUnread(unread+1);
+    }
+  };
+}
+
+/* ---------- ui wiring ---------- */
+$('send').onclick=submit;
+msg.addEventListener('keydown',e=>{if(e.key==='Enter')submit()});
+$('ping').onclick=()=>send('','ping');
+$('dl').onclick=save;$('clr').onclick=doClear;
+$('replay').onclick=()=>{if(lastIn)announce(lastIn);else sys('NOTHING TO REPLAY')};
+$('stop').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel()};
+['vOn','sOn'].forEach(i=>{$(i).checked=S.get(i,$(i).checked?'1':'0')==='1';$(i).onchange=()=>S.set(i,$(i).checked?'1':'0')});
+['rate','pitch'].forEach(i=>{$(i).value=S.get(i,$(i).value);$(i).onchange=()=>S.set(i,$(i).value)});
+$('voice').onchange=()=>S.set('voice',$('voice').value);
+
+uid=S.get('uid','')||Math.random().toString(36).slice(2,12);S.set('uid',uid);
+const cs=$('cs');cs.value=S.get('callsign','');$('room').value=S.get('room','');
+function enter(){
+  const rc=$('room').value.trim().replace(/[^A-Za-z0-9_-]/g,'');
+  if(rc.length<8){$('room').value='';$('room').placeholder='8+ LETTERS/NUMBERS';$('room').focus();return}
+  room='ipsdrake-'+rc;S.set('room',rc);
+  callsign=(cs.value.trim()||'OPERATOR').toUpperCase();S.set('callsign',callsign);
+  $('me').textContent=callsign;
+  $('boot').classList.add('h');
+  /* unlock speech + audio on this user gesture */
+  try{speechSynthesis.speak(new SpeechSynthesisUtterance(''))}catch(e){}
+  beep(440,880);
+  connect();setTimeout(()=>msg.focus(),700);
+}
+$('go').onclick=enter;
+cs.addEventListener('keydown',e=>{if(e.key==='Enter')enter()});$('room').addEventListener('keydown',e=>{if(e.key==='Enter')enter()});
+$('boot').addEventListener('click',e=>{if(e.target===$('boot'))enter()});
+})();
+</script>
+</body>
+</html>
